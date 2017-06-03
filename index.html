@@ -55,7 +55,8 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <article class="markdown-body">
-
+                            <!-- note the triple curly braces -->
+                            {{{ renderedmarkdown }}}
                         </article>
                     </div>
                 </div>
@@ -63,7 +64,7 @@
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <button type="button" class="btn btn-primary pull-right">Preview</button>
+                <button type="button" class="btn btn-primary pull-right" @click="renderPreview">Preview</button>
             </div>
         </div>
     </div>
@@ -74,7 +75,26 @@
     <script src="https://cdn.jsdelivr.net/vue.resource/0.7.0/vue-resource.min.js"></script>
     <script>
       var vm = new Vue({
-        el: "#app"
+        el: "#app",
+        data: {
+          rawMarkdown: ''
+        },
+        methods: {
+          renderPreview: function(){
+            // POST request to GitHub API
+            this.$http({
+              url: 'https://api.github.com/markdown',
+              method: 'POST',
+              data: {text: this.rawMarkdown, mode: 'gfm'}
+            }).then(function(response){
+              // success callback
+              this.renderedMarkdown = response.data;
+            }, funtion(response){
+              // error callback
+              console.log(response.data);
+            });
+          }
+        }
       });
     </script>
 </body>
